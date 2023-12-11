@@ -1,6 +1,3 @@
-email = "adegbamiyestephen2018, olamidebaddo"
-emails = email.split(",")
-for email in emails:
-    email = email.strip()
+from controllers.utils import sendemail
 
-print(emails)
+sendemail("Hello test", "adegbamiyestephen2018@gmail.com", "this is a test message")

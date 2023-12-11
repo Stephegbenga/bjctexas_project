@@ -9,8 +9,9 @@ app = Flask(__name__, static_url_path='',
 
 @app.post("/webhook")
 def webhook():
-    req = request.json
-    print("received  ======", req)
+    req = {}
+    raw_text = request.data.decode('utf-8')
+    req['value'] = raw_text
     req['timestamp'] = timestamp()
     req['sent'] = False
 
