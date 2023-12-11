@@ -14,7 +14,7 @@ def webhook():
 
 
 @app.post("/updatesettings")
-def webhook():
+def updatesettings():
     req = request.json
     Settings.update_one({}, {"$set": req})
 
