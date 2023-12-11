@@ -74,4 +74,3 @@ def send_email_on_schedule(message, settings):
 
     except Exception as e:
         print(e)
-
