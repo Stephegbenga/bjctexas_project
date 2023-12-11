@@ -16,9 +16,13 @@ def webhook():
     setting = Settings.find_one({}, {"_id": 0})
     email = setting.get("email")
 
+    emails = email.split(",")
+
     if should_message_be_sent(setting):
-        req['sent'] = True
-        sendemail("New Event Received", email, req.get("value"))
+        for email in emails:
+            email = email.strip()
+            req['sent'] = True
+            sendemail("New Event Received", email, req.get("value"))
 
 
     Events.insert_one(req)

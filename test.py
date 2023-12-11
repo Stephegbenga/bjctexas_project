@@ -1,8 +1,6 @@
-from controllers.models import Events, Settings
-from controllers.utils import should_message_be_sent
+email = "adegbamiyestephen2018, olamidebaddo"
+emails = email.split(",")
+for email in emails:
+    email = email.strip()
 
-
-events = Events.find({})
-
-for event in events:
-    print(event)
+print(emails)
