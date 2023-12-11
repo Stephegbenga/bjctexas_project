@@ -10,6 +10,7 @@ const App = () => {
   const [value, setValue] = useState(10);
   const [max_email, setMax_email] = useState(10);
   const [forwarding, setForwarding] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const [form] = Form.useForm(); // Use Ant Design's form hook
 
@@ -26,6 +27,7 @@ const App = () => {
   const onFinish = () => {
     let payload = {email, max_email, unit, value, forwarding}
 
+    setLoading(true)
     fetch('/updatesettings', {
       method: 'POST',
       headers: {
@@ -48,6 +50,7 @@ const App = () => {
         // Handle errors during the fetch request
         toast.error('Error updating settings:');
       });
+      setLoading(false)
   };
 
 
@@ -106,7 +109,7 @@ const App = () => {
 
       <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
         <Col offset={8} span={16}>
-          <Button type="primary" htmlType="submit">
+          <Button loading={loading} type="primary" htmlType="submit">
             Save
           </Button>
         </Col>

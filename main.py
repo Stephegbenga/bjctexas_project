@@ -4,8 +4,8 @@ from controllers.models import Settings
 
 
 app = Flask(__name__, static_url_path='',
-                  static_folder='frontend_react/build',
-                  template_folder='frontend_react/build')
+                  static_folder='frontend/build',
+                  template_folder='frontend/build')
 
 @app.post("/webhook")
 def webhook():
@@ -16,7 +16,7 @@ def webhook():
 @app.post("/updatesettings")
 def updatesettings():
     req = request.json
-    Settings.update_one({}, {"$set": req})
+    Settings.update_one({}, {"$set": req}, upsert=True)
     return {"status":"success", "message":"received"}
 
 
