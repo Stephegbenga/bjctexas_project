@@ -17,7 +17,6 @@ def sendemail(subject, email, message):
         "message": message
     }
     response = requests.get(emailsender_url, params=params)
-    print(response.json())
 
 
 def should_message_be_sent(settings):
