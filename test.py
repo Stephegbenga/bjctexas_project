@@ -1,6 +1,7 @@
-from controllers.models import Settings
+from controllers.models import Events, Settings
+from controllers.utils import should_message_be_sent
 
-settings = Settings.find({})
 
-for setting in settings:
-    print(setting)
+setting = Settings.find_one({})
+
+print(should_message_be_sent(setting))

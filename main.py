@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 from controllers.models import Settings, Events
-from controllers.utils import timestamp
+from controllers.utils import timestamp, should_message_be_sent, sendemail
 
 
 app = Flask(__name__, static_url_path='',
@@ -10,9 +10,18 @@ app = Flask(__name__, static_url_path='',
 @app.post("/webhook")
 def webhook():
     req = request.json
-    req['timestamp'] =timestamp()
-    Events.insert_one(req)
+    req['timestamp'] = timestamp()
+    req['sent'] = False
 
+    setting = Settings.find_one({}, {"_id": 0})
+    email = setting.get("email")
+
+    if should_message_be_sent(setting):
+        req['sent'] = True
+        sendemail("New Event Received", email, req.get("value"))
+
+
+    Events.insert_one(req)
     return {"status":"received"}
 
 
