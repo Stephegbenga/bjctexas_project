@@ -17,6 +17,7 @@ def webhook():
 def updatesettings():
     req = request.json
     Settings.update_one({}, {"$set": req})
+    return {"status":"success", "message":"received"}
 
 
 # Serve React build
