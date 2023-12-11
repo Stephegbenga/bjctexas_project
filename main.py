@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-import os
+from controllers.models import Settings
 
 
 
@@ -11,6 +11,12 @@ app = Flask(__name__, static_url_path='',
 def webhook():
     req = request.json
     return {"status":"received"}
+
+
+@app.post("/updatesettings")
+def webhook():
+    req = request.json
+    Settings.update_one({}, {"$set": req})
 
 
 # Serve React build
