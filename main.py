@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 from controllers.models import Settings, Events
-from controllers.utils import timestamp, should_message_be_sent, sendemail
-
+from controllers.utils import timestamp, send_email_on_schedule
+from threading import Thread
 
 app = Flask(__name__, static_url_path='',
                   static_folder='frontend/build',
@@ -16,16 +16,8 @@ def webhook():
     req['sent'] = False
 
     setting = Settings.find_one({}, {"_id": 0})
-    email = setting.get("email")
 
-    emails = email.split(",")
-
-    if should_message_be_sent(setting):
-        for email in emails:
-            email = email.strip()
-            req['sent'] = True
-            sendemail("New Event Received", email, req.get("value"))
-
+    Thread(target=send_email_on_schedule, args=[raw_text, setting]).start()
 
     Events.insert_one(req)
     return {"status":"received"}

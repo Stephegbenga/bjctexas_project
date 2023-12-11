@@ -1,3 +1,5 @@
-from controllers.utils import sendemail
+from controllers.models import Settings
 
-sendemail("Hello test", "adegbamiyestephen2018@gmail.com", "this is a test message")
+setting = Settings.find_one({})
+
+print(setting)

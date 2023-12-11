@@ -1,0 +1,11 @@
+mongodb.com
+We used this to stored the events and the timestamp at which they come in
+
+render.com
+we used this for our hosting, bot the ui and the backend that was used in receiving the webhook
+
+github.com
+this is a website mostly used by developers and organizations to share codes (not really necessary)
+
+#google sheets
+we make use of the appscripts on google sheets to create a software that is used for sending emails

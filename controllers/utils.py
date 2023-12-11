@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
-from controllers.models import Events
+from controllers.models import Settings
 import requests
 from dotenv import load_dotenv
 load_dotenv()
 import os
+from time import sleep
 
 emailsender_url = os.getenv("emailsender_url")
 
@@ -20,32 +21,57 @@ def sendemail(subject, email, message):
     print(response.text)
 
 
-def should_message_be_sent(settings):
+
+def get_interval_in_seconds(value, unit):
+    if unit == "min":
+        value_in_seconds = int(value) * 60
+    elif unit == "hour":
+        value_in_seconds = int(value) * 60 * 60
+    elif unit == "day":
+        value_in_seconds = int(value) * 24 * 60 * 60
+    else:
+        value_in_seconds = int(value)
+    return value_in_seconds
+
+
+
+def send_email_on_schedule(message, settings):
     try:
         unit = settings.get("unit")
         value = int(settings.get('value'))
+
         max_email = int(settings.get("max_email"))
+
+        email_list = settings.get("email")
+        last_reset = settings.get("reset")
+
+        emails = email_list.split(",")
+        emails = [email.strip() for email in emails]
+
         forwarding = settings.get("forwarding")
 
         if not forwarding:
             return False
 
-        current_time = datetime.utcnow()
+        sent_emails = 0
+        interval = get_interval_in_seconds(value, unit)
 
-        if unit == "min":
-            timeago = datetime.utcnow() - timedelta(minutes=value)
-        elif unit == "day":
-            timeago = datetime.utcnow() - timedelta(days=value)
-        else:
-            timeago = datetime.utcnow() - timedelta(hours=value)
+        while True:
+            if sent_emails >= max_email:
+                return
 
-        query = {"timestamp": {"$gte": timeago.isoformat(), "$lte": current_time.isoformat()}}
-        events = list(Events.find(query))
+            settings = Settings.find_one({})
+            new_reset = settings.get("reset")
 
-        if len(events) < max_email:
-            return True
-        else:
-            return False
+            if new_reset != last_reset:
+                return
+
+            for email in emails:
+                sendemail("New Event Received", email, message)
+
+            sent_emails += 1
+            sleep(interval)
+
     except Exception as e:
         print(e)
-        return False
+

@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Form, Input, Select, Button, Col, Row, Switch, message as toast, Spin, Flex} from "antd";
+import uuid from "react-uuid";
+
 
 const {Option} = Select;
 const App = () => {
@@ -48,11 +50,10 @@ const App = () => {
     });
   }, [email, max_email, unit, value, forwarding, form]);
 
-  const onFinish = async () => {
-    let payload = {email, max_email, unit, value, forwarding};
 
+
+  const update_setting = async (payload) => {    
     try {
-      setLoading(true);
 
       const response = await fetch("/settings", {
         method: "POST",
@@ -65,18 +66,43 @@ const App = () => {
 
       if (!response.ok) {
         toast.error("Network response was not ok");
-        return;
+        return
       }
 
       const data = await response.json();
-      // Handle the response data as needed
-      toast.success("Settings updated successfully:");
+      return data
     } catch (error) {
       toast.error("Error updating settings:");
-    } finally {
-      setLoading(false);
+      return
+    } 
+  }
+
+
+
+  const onFinish = async () => {
+    let payload = {email, max_email, unit, value, forwarding};
+    setLoading(true)
+    let res = await update_setting(payload)
+
+    if(res){
+      toast.success("settings updated")
     }
+    setLoading(false)
   };
+
+
+
+  const reset_email_queue = async () => {
+    let payload = {email, max_email, unit, value, forwarding, reset: uuid()};
+    setLoading(true)
+    let res = await update_setting(payload)
+
+    if(res){
+      toast.success("email queue reset")
+    }
+
+    setLoading(false)
+  }
 
   if (main_loading) {
     return (
@@ -97,59 +123,66 @@ const App = () => {
   }
 
   return (
-    <Form
-      form={form}
-      style={{width: "auto", padding: 40}}
-      labelCol={{span: 8}}
-      wrapperCol={{span: 16}}
-      onFinish={onFinish}
-      labelAlign="top"
-      initialValues={{
-        email,
-        maxEmails: max_email,
-        maxEmailsTimeUnit: {unit, value},
-        forwarding,
-      }}
-    >
-      <Form.Item label="Receiving Email" name="email">
-        <Input style={{width: "530px"}} value={email} onChange={(e) => setEmail(e.target.value)} />
-      </Form.Item>
+    <Row justify="center" align="top" style={{ minHeight: "100vh", marginTop: 70 }}>
+      <Col span={8}>
+        <Form
+          form={form}
+          onFinish={onFinish}
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          labelAlign="left"
+          initialValues={{
+            email,
+            maxEmails: max_email,
+            maxEmailsTimeUnit: { unit, value },
+            forwarding,
+          }}
+        >
+          <Form.Item label="Receiving Email" name="email">
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+          </Form.Item>
 
-      <Form.Item label="Max Emails" name="maxEmails">
-        <Input type="number" style={{width: "530px"}} value={max_email} onChange={(e) => setMax_email(e.target.value)} min={1} />
-      </Form.Item>
+          <Form.Item label="Max Emails" name="maxEmails">
+            <Input type="number" value={max_email} onChange={(e) => setMax_email(e.target.value)} min={1} />
+          </Form.Item>
 
-      <Form.Item label="Frequency" name="maxEmailsTimeUnit">
-        <Row gutter={8}>
-          <Col span={8}>
-            <Form.Item name={["maxEmailsTimeUnit", "value"]} noStyle>
-              <Input value={value} type="number" min={1} onChange={(e) => setValue(e.target.value)} />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item name={["maxEmailsTimeUnit", "unit"]} noStyle>
-              <Select value={unit} onChange={(value) => setUnit(value)}>
-                <Option value="min">Minutes</Option>
-                <Option value="hour">Hours</Option>
-                <Option value="day">Days</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form.Item>
+          <Form.Item label="Frequency" name="maxEmailsTimeUnit">
+            <Row gutter={8}>
+              <Col span={6}>
+                <Form.Item name={["maxEmailsTimeUnit", "value"]} noStyle>
+                  <Input value={value} type="number" min={1} onChange={(e) => setValue(e.target.value)} />
+                </Form.Item>
+              </Col>
+              <Col span={10}>
+                <Form.Item name={["maxEmailsTimeUnit", "unit"]} noStyle>
+                  <Select value={unit} onChange={(value) => setUnit(value)}>
+                  <Option value="sec">Seconds</Option>
+                    <Option value="min">Minutes</Option>
+                    <Option value="hour">Hours</Option>
+                    <Option value="day">Days</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form.Item>
 
-      <Form.Item label="Forwarding" name="forwarding">
-        <Switch checked={forwarding} onChange={(checked) => setForwarding(checked)} />
-      </Form.Item>
+          <Form.Item label="Forwarding" name="forwarding" valuePropName="checked">
+            <Switch onChange={(checked) => setForwarding(checked)} />
+          </Form.Item>
 
-      <Form.Item wrapperCol={{offset: 8, span: 16}}>
-        <Col offset={8} span={16}>
-          <Button loading={loading} type="primary" htmlType="submit">
-            Save
-          </Button>
-        </Col>
-      </Form.Item>
-    </Form>
+          <Form.Item wrapperCol={{ offset: 8, span: 30 }}>
+            <Col span={30}>
+              <Button loading={loading} type="primary" htmlType="submit">
+                Save
+              </Button>
+              <Button loading={loading} style={{ marginLeft: 8 }} onClick={reset_email_queue}>
+                Reset email queue
+              </Button>
+            </Col>
+          </Form.Item>
+        </Form>
+      </Col>
+    </Row>
   );
 };
 
