@@ -12,10 +12,41 @@ const App = () => {
   const [forwarding, setForwarding] = useState(false);
   const [loading, setLoading] = useState(false)
 
-  const [form] = Form.useForm(); // Use Ant Design's form hook
+  const [form] = Form.useForm(); 
+
+
+  
+  useEffect(() => {
+
+    const onLoad = async () => {
+      try {
+        const response = await fetch('/settings'); // Replace with your endpoint
+        if (!response.ok) {
+          toast.error('Network response was not ok');
+        }
+
+        const res = await response.json();
+        let {email, max_email, unit, value, forwarding} = res.data
+        setEmail(email)
+        setMax_email(max_email)
+        setForwarding(forwarding)
+        setValue(value)
+        setUnit(unit)
+      } catch (error) {
+        toast.error('Error fetching settings:');
+      } finally {
+      }
+
+    }
+
+    onLoad()
+
+  }, [])
+
+
+
 
   useEffect(() => {
-    // Set initial values when the component mounts
     form.setFieldsValue({
       email,
       maxEmails: max_email,
@@ -24,33 +55,36 @@ const App = () => {
     });
   }, [email, max_email, unit, value, forwarding, form]);
 
-  const onFinish = () => {
-    let payload = {email, max_email, unit, value, forwarding}
+  
 
-    setLoading(true)
-    fetch('/updatesettings', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // You may need to include additional headers based on your server requirements
-      },
-      body: JSON.stringify(payload),
-    })
-      .then(response => {
-        if (!response.ok) {
-         toast.error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Handle the response data as needed
-        toast.success('Settings updated successfully:');
-      })
-      .catch(error => {
-        // Handle errors during the fetch request
-        toast.error('Error updating settings:');
+  const onFinish = async () => {
+    let payload = { email, max_email, unit, value, forwarding };
+  
+    try {
+      setLoading(true);
+  
+      const response = await fetch('/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // You may need to include additional headers based on your server requirements
+        },
+        body: JSON.stringify(payload),
       });
-      setLoading(false)
+  
+      if (!response.ok) {
+        toast.error('Network response was not ok');
+        return;
+      }
+  
+      const data = await response.json();
+      // Handle the response data as needed
+      toast.success('Settings updated successfully:');
+    } catch (error) {
+      toast.error('Error updating settings:');
+    } finally {
+      setLoading(false);
+    }
   };
 
 

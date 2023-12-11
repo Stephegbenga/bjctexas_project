@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
-from controllers.models import Settings
-
+from controllers.models import Settings, Events
+from controllers.utils import timestamp
 
 
 app = Flask(__name__, static_url_path='',
@@ -10,10 +10,19 @@ app = Flask(__name__, static_url_path='',
 @app.post("/webhook")
 def webhook():
     req = request.json
+    req['timestamp'] =timestamp()
+    Events.insert_one(req)
+
     return {"status":"received"}
 
 
-@app.post("/updatesettings")
+@app.get("/settings")
+def getsettings():
+    setting = Settings.find_one({}, {"_id": 0})
+    return {"status":"success", "data": setting}
+
+
+@app.post("/settings")
 def updatesettings():
     req = request.json
     Settings.update_one({}, {"$set": req}, upsert=True)
@@ -24,6 +33,7 @@ def updatesettings():
 @app.route('/')
 def serve():
     return render_template("index.html")
+
 
 
 if __name__ == '__main__':
