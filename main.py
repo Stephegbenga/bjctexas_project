@@ -4,8 +4,8 @@ from controllers.models import Settings
 
 
 app = Flask(__name__, static_url_path='',
-                  static_folder='frontend/build',
-                  template_folder='frontend/build')
+                  static_folder='frontend_react/build',
+                  template_folder='frontend_react/build')
 
 @app.post("/webhook")
 def webhook():
