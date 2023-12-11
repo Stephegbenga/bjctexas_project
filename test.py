@@ -2,6 +2,7 @@ from controllers.models import Events, Settings
 from controllers.utils import should_message_be_sent
 
 
-setting = Settings.find_one({})
+events = Events.find({})
 
-print(should_message_be_sent(setting))
+for event in events:
+    print(event)
