@@ -119,7 +119,7 @@ const App = () => {
         <Input type="number" style={{width: "530px"}} value={max_email} onChange={(e) => setMax_email(e.target.value)} min={1} />
       </Form.Item>
 
-      <Form.Item label="Every" name="maxEmailsTimeUnit">
+      <Form.Item label="Frequency" name="maxEmailsTimeUnit">
         <Row gutter={8}>
           <Col span={8}>
             <Form.Item name={["maxEmailsTimeUnit", "value"]} noStyle>
