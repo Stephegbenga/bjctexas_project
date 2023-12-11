@@ -1,16 +1,22 @@
-from flask import Flask, request
-app = Flask(__name__)
+from flask import Flask, request, render_template
+import os
 
 
-@app.get("/")
-def get():
-    return {"status":"received"}
 
+app = Flask(__name__, static_url_path='',
+                  static_folder='frontend/build',
+                  template_folder='frontend/build')
 
 @app.post("/webhook")
 def webhook():
     req = request.json
     return {"status":"received"}
+
+
+# Serve React build
+@app.route('/')
+def serve():
+    return render_template("index.html")
 
 
 if __name__ == '__main__':

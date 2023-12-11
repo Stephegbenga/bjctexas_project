@@ -10,3 +10,4 @@ zappa_settings.json
 venv
 update_note.txt
 data_formats
+frontend/node_modules
