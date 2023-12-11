@@ -39,7 +39,7 @@ def should_message_be_sent(settings):
         else:
             timeago = datetime.utcnow() - timedelta(hours=value)
 
-        query = {"timestamp": {"$gte": timeago, "$lte": current_time}}
+        query = {"timestamp": {"$gte": timeago.isoformat(), "$lte": current_time.isoformat()}}
         events = list(Events.find(query))
 
         if len(events) < max_email:
