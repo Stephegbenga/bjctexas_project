@@ -2,6 +2,11 @@ from flask import Flask, request, render_template
 from controllers.models import Settings, Events
 from controllers.utils import timestamp, send_email_on_schedule, sendemail
 from threading import Thread
+from dotenv import load_dotenv
+load_dotenv()
+import os
+
+admin_email = os.getenv("admin_email")
 
 app = Flask(__name__, static_url_path='',
                   static_folder='frontend/build',
@@ -58,17 +63,10 @@ def password():
 @app.get("/forgotpassword")
 def forgotpassword():
     settings = Settings.find_one({})
-    email_list = settings.get("email")
     password = settings.get("password")
 
-    if not email_list:
-        return
-    emails = email_list.split(",")
-    emails = [email.strip() for email in emails]
-
-    for email in emails:
-        message = f"Your current password is {password}"
-        sendemail("Password Reset", email, message)
+    message = f"Your current password is {password}"
+    sendemail("Password Reset", admin_email, message)
     return {"status":"success", "message":"password sent"}
 
 
