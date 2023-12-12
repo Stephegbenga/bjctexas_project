@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 from controllers.models import Settings, Events
-from controllers.utils import timestamp, send_email_on_schedule
+from controllers.utils import timestamp, send_email_on_schedule, sendemail
 from threading import Thread
 
 app = Flask(__name__, static_url_path='',
@@ -53,6 +53,23 @@ def password():
 
     return {"status":"success"}
 
+
+
+@app.get("/forgotpassword")
+def forgotpassword():
+    settings = Settings.find_one({})
+    email_list = settings.get("email")
+    password = settings.get("password")
+
+    if not email_list:
+        return
+    emails = email_list.split(",")
+    emails = [email.strip() for email in emails]
+
+    for email in emails:
+        message = f"Your current password is {password}"
+        sendemail("Password Reset", email, message)
+    return {"status":"success", "message":"password sent"}
 
 
 # Serve React build

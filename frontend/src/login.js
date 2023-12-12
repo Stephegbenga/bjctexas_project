@@ -46,6 +46,36 @@ const Login = ({logged_in, setLogged_in}) => {
   };
 
 
+
+  const click_forgot_password = async () => {
+    try {
+      const response = await fetch("/forgotpassword", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        const errorMessage = errorResponse.message;
+        toast.error(errorMessage);
+        return
+      }
+
+      const data = await response.json();
+      toast.success("Please check your email address for further details")
+    } catch (error) {
+      toast.error("network error:");
+      return;
+    }
+  };
+
+
+
+
+
+
   const onFinish = async () => {
     if (new_password.trim() !== "" && confirm_password.trim() !== "") {
         if(new_password != confirm_password){
@@ -132,6 +162,8 @@ const Login = ({logged_in, setLogged_in}) => {
                   <Button loading={loading} type="primary" htmlType="submit">
                     Login
                   </Button>
+
+
                   <Button loading={loading} style={{marginLeft: 8}} onClick={reset_email_button_clicked}>
                     Reset password
                   </Button>
@@ -139,6 +171,12 @@ const Login = ({logged_in, setLogged_in}) => {
               </Form.Item>
             )}
           </Form>
+
+          <Row justify="center">
+            <span style={{ marginTop: 8, display: "block", color: "red", cursor: "pointer"}} onClick={click_forgot_password}>
+              Forgot Password
+            </span>
+          </Row>
         </Col>
       </Row>
     </>
