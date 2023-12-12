@@ -1,5 +1,5 @@
 from controllers.models import Settings
 
-setting = Settings.find_one({})
+setting = Settings.update_one({}, {"$set":{"password": "1234"}})
 
 print(setting)

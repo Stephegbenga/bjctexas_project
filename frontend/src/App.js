@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {Form, Input, Select, Button, Col, Row, Switch, message as toast, Spin, Flex} from "antd";
 import uuid from "react-uuid";
-
+import Login from "./login"
 
 const {Option} = Select;
+
 const App = () => {
   const [email, setEmail] = useState("");
   const [unit, setUnit] = useState("min");
@@ -12,6 +13,7 @@ const App = () => {
   const [forwarding, setForwarding] = useState(false);
   const [loading, setLoading] = useState(false);
   const [main_loading, setMain_loading] = useState(false);
+  const [logged_in, setLogged_in] = useState(false)
 
   const [form] = Form.useForm();
 
@@ -104,7 +106,13 @@ const App = () => {
     setLoading(false)
   }
 
-  if (main_loading) {
+
+
+  if(!logged_in){
+    return (<Login logged_in={logged_in} setLogged_in={setLogged_in} />)
+
+  }
+ else if (main_loading) {
     return (
       <div
         style={{
@@ -123,7 +131,12 @@ const App = () => {
   }
 
   return (
-    <Row justify="center" align="top" style={{ minHeight: "100vh", marginTop: 70 }}>
+    <>
+      <Row justify="center">
+        <h3>Settings Dashboard</h3>
+      </Row>
+    <Row justify="center" align="top" style={{ minHeight: "100vh", marginTop: 30 }}>
+
       <Col span={8}>
         <Form
           form={form}
@@ -183,6 +196,7 @@ const App = () => {
         </Form>
       </Col>
     </Row>
+    </>
   );
 };
 

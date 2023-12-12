@@ -25,7 +25,7 @@ def webhook():
 
 @app.get("/settings")
 def getsettings():
-    setting = Settings.find_one({}, {"_id": 0})
+    setting = Settings.find_one({}, {"_id": 0, "password": 0})
     return {"status":"success", "data": setting}
 
 
@@ -34,6 +34,25 @@ def updatesettings():
     req = request.json
     Settings.update_one({}, {"$set": req}, upsert=True)
     return {"status":"success", "message":"received"}
+
+
+@app.post("/password")
+def password():
+    req = request.json
+    show_reset = req.get("show_reset")
+    password = req.get("password")
+    new_password = req.get("new_password")
+
+    setting = Settings.find_one({}, {"_id": 0})
+
+    if setting.get("password") != password:
+        return {"message": "incorrect password"}, 401
+
+    if show_reset:
+        Settings.update_one({}, {"$set": {"password": str(new_password)}}, upsert=True)
+
+    return {"status":"success"}
+
 
 
 # Serve React build
